@@ -13,13 +13,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
-      - name: Install NDK 25.1.8937393
+      - name: Install NDK and configure paths
         run: |
-          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;25.1.8937393"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;25.1.8937393"
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "ndk.dir=$ANDROID_HOME/ndk/25.1.8937393" >> local.properties
           
       - name: Build with Gradle
         run: |
