@@ -1,0 +1,19 @@
+name: Build Native Library
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r23b
+          add-to-path: true
+      - name: Build with CMake
+        run: |
+          cd app/src/main/jni
+          ndk-build
+          
