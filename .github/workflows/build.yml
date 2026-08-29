@@ -1,4 +1,4 @@
-name: Build Mod Menu
+Name: Build Mod Menu
 
 on: [push]
 
@@ -14,8 +14,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           
+      - name: Setup Android SDK & NDK
+        uses: android-actions/setup-android@v3
+          
+      - name: Install required NDK
+        run: sdkmanager "ndk;25.1.8937393"
+          
       - name: Build with Gradle
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug
-          
