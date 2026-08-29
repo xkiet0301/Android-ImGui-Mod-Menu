@@ -5,9 +5,6 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ANDROID_HOME: /usr/local/lib/android/sdk
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
     steps:
       - name: Checkout code
@@ -22,14 +19,13 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept Licenses & Install NDK / CMake
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;25.1.8937393" "cmake;3.22.1"
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+      - name: Setup NDK 25.1.8937393
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r25b
 
       - name: Build with Gradle
-        run: ./gradlew assembleDebug --no-daemon
-        
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+          
