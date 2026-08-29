@@ -14,12 +14,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           
-      - name: Setup Android NDK
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: 25.1.8937393
-          add-to-path: true
-          
       - name: Build with Gradle
         run: |
           chmod +x gradlew
