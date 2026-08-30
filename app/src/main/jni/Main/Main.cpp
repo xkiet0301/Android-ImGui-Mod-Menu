@@ -1,9 +1,7 @@
 #include "Main.h"
-#include "imgui.h"
+#include <Includes/imgui.h>
 
-// Hàm vẽ giao diện Mod Menu
 void DrawMenu() {
-    // Đã đổi tên menu thành xkietmods
     ImGui::Begin("xkietmods", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: Activated");
@@ -31,4 +29,12 @@ void DrawMenu() {
 
 void SetupImgui() {
     DrawMenu();
+}
+
+// Các hàm bổ trợ hệ thống để tránh lỗi biên dịch Main.o
+extern "C" {
+    JNIEXPORT void JNICALL
+    Java_com_android_support_Preferences_Changes(JNIEnv *env, jclass clazz, jobject feature, jint value) {
+        // Callback tùy chọn
+    }
 }
