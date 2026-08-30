@@ -3,44 +3,34 @@
 #include <unistd.h>
 #include "Main.h"
 
-// 1. Hàm vẽ giao diện menu xkietmods
+// Giao diện ImGui chuẩn
 void DrawMenu() {
     ImGui::Begin("xkietmods", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: Activated");
+    ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: Active");
     ImGui::Separator();
 
-    static bool bAimbot = false;
-    ImGui::Checkbox("Auto Aimbot", &bAimbot);
+    static bool bOption1 = false;
+    ImGui::Checkbox("Option 1", &bOption1);
 
-    static bool bESP = false;
-    ImGui::Checkbox("Player ESP", &bESP);
-
-    static bool bWallhack = false;
-    ImGui::Checkbox("Wallhack 3D", &bWallhack);
-
-    ImGui::Separator();
-
-    static float fFOV = 90.0f;
-    ImGui::SliderFloat("Aimbot FOV", &fFOV, 10.0f, 360.0f);
-
-    static int iSpeed = 1;
-    ImGui::SliderInt("Speed Hack", &iSpeed, 1, 5);
+    static float fValue = 50.0f;
+    ImGui::SliderFloat("Slider", &fValue, 0.0f, 100.0f);
 
     ImGui::End();
 }
 
-// 2. Bắt buộc để NDK biên dịch thành công Main.o
+// Hàm khởi tạo ImGui bắt buộc của khung dự án
 void SetupImgui() {
     DrawMenu();
 }
 
-void *hack_thread(void *) {
-    sleep(5);
+// Luồng chạy nền khởi tạo
+void *main_thread(void *) {
+    sleep(3);
     return NULL;
 }
 
-__attribute__((constructor)) void __init() {
+__attribute__((constructor)) void lib_main() {
     pthread_t pt;
-    pthread_create(&pt, NULL, hack_thread, NULL);
+    pthread_create(&pt, NULL, main_thread, NULL);
 }
