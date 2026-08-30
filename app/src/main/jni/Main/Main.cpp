@@ -1,6 +1,9 @@
+#include <jni.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "Main.h"
-#include <Includes/imgui.h>
 
+// 1. Hàm vẽ giao diện menu xkietmods
 void DrawMenu() {
     ImGui::Begin("xkietmods", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -27,14 +30,17 @@ void DrawMenu() {
     ImGui::End();
 }
 
+// 2. Bắt buộc để NDK biên dịch thành công Main.o
 void SetupImgui() {
     DrawMenu();
 }
 
-// Các hàm bổ trợ hệ thống để tránh lỗi biên dịch Main.o
-extern "C" {
-    JNIEXPORT void JNICALL
-    Java_com_android_support_Preferences_Changes(JNIEnv *env, jclass clazz, jobject feature, jint value) {
-        // Callback tùy chọn
-    }
+void *hack_thread(void *) {
+    sleep(5);
+    return NULL;
+}
+
+__attribute__((constructor)) void __init() {
+    pthread_t pt;
+    pthread_create(&pt, NULL, hack_thread, NULL);
 }
