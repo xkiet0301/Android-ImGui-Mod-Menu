@@ -1,8 +1,10 @@
 #include "Main.h"
 #include "imgui.h"
 
+// Hàm vẽ giao diện Mod Menu
 void DrawMenu() {
-    ImGui::Begin("VIP MOD MENU", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    // Đã đổi tên menu thành xkietmods
+    ImGui::Begin("xkietmods", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: Activated");
     ImGui::Separator();
@@ -25,4 +27,8 @@ void DrawMenu() {
     ImGui::SliderInt("Speed Hack", &iSpeed, 1, 5);
 
     ImGui::End();
+}
+
+void SetupImgui() {
+    DrawMenu();
 }
