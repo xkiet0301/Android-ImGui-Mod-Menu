@@ -19,7 +19,7 @@ void DrawMenu() {
     ImGui::End();
 }
 
-// Hàm khởi tạo ImGui bắt buộc của khung dự án
+// Callback bắt buộc cho NDK
 void SetupImgui() {
     DrawMenu();
 }
