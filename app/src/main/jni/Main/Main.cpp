@@ -1,16 +1,12 @@
 #include "Main.h"
 #include "imgui.h"
 
-// Hàm vẽ giao diện Mod Menu
 void DrawMenu() {
-    // 1. Khởi tạo cửa sổ Mod Menu
     ImGui::Begin("VIP MOD MENU", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
-    // Thông tin trạng thái
     ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: Activated");
     ImGui::Separator();
 
-    // 2. Các nút Bật/Tắt (Checkboxes)
     static bool bAimbot = false;
     ImGui::Checkbox("Auto Aimbot", &bAimbot);
 
@@ -22,13 +18,11 @@ void DrawMenu() {
 
     ImGui::Separator();
 
-    // 3. Các thanh trượt chỉ số (Sliders)
     static float fFOV = 90.0f;
     ImGui::SliderFloat("Aimbot FOV", &fFOV, 10.0f, 360.0f);
 
     static int iSpeed = 1;
     ImGui::SliderInt("Speed Hack", &iSpeed, 1, 5);
 
-    // 4. Kết thúc khung Menu
     ImGui::End();
 }
