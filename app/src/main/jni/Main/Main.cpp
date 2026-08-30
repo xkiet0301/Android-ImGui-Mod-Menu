@@ -1,7 +1,6 @@
 #include <jni.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <stdbool.h>
 
 // Bắt buộc bao hàm ImGui
 #include "imgui.h" 
@@ -102,12 +101,19 @@ void SetupImgui() {
 
 // Luồng khởi tạo nền
 void *main_thread(void *arg) {
+    (void)arg; // Bỏ qua cảnh báo biến không sử dụng
     sleep(3);
+    
+    // Nơi đây thường sẽ gọi các logic hack (ví dụ đọc/ghi bộ nhớ)
+    
     return NULL;
 }
 
 // Chạy luồng khởi tạo an toàn qua JNI_OnLoad
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+    (void)vm;       // Bỏ qua cảnh báo biến không sử dụng
+    (void)reserved; // Bỏ qua cảnh báo biến không sử dụng
+    
     pthread_t pt;
     pthread_create(&pt, NULL, main_thread, NULL);
     return JNI_VERSION_1_6;
