@@ -16,16 +16,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Setup NDK 25.1.8937393
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r25b
-
       - name: Build with Gradle
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug
           
