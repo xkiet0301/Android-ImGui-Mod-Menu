@@ -1,56 +1,34 @@
-//
-// Created by reveny on 21/08/2023.
-//
+#include "Main.h"
+#include "imgui.h"
 
-#include "../Include/KittyMemory/MemoryPatch.h"
-#include "../Include/ImGui.h"
-#include "../Include/RemapTools.h"
-
-#include "../Include/Drawing.h"
-#include "../Include/Unity.h"
-
+// Hàm vẽ giao diện Mod Menu
 void DrawMenu() {
-    ImGui::ShowDemoWindow();
-}
+    // 1. Khởi tạo cửa sổ Mod Menu
+    ImGui::Begin("VIP MOD MENU", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
-void *thread(void *) {
-    LOGI(OBFUSCATE("Main Thread Loaded: %d"), gettid());
-    initModMenu((void *)DrawMenu);
+    // Thông tin trạng thái
+    ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: Activated");
+    ImGui::Separator();
 
-    //Hooks, Patches and Pointers here
-    //Example:
-    /*
-     * DobbyHook(getAbsoluteAddress("libIl2cpp.so", 0x0), FunctionExample, old_FunctionExample);
-     * SetAimRotation = (void (*)(void *, Quaternion)) getAbsoluteAddress("libIl2cpp.so", 0x0);
-     */
+    // 2. Các nút Bật/Tắt (Checkboxes)
+    static bool bAimbot = false;
+    ImGui::Checkbox("Auto Aimbot", &bAimbot);
 
-    LOGI("Main thread done");
-    pthread_exit(0);
-}
+    static bool bESP = false;
+    ImGui::Checkbox("Player ESP", &bESP);
 
-// Call anything from JNI_OnLoad here
-extern "C" {
-    // JNI Support
-    JavaVM *jvm = nullptr;
-    JNIEnv *env = nullptr;
+    static bool bWallhack = false;
+    ImGui::Checkbox("Wallhack 3D", &bWallhack);
 
-    __attribute__((visibility ("default")))
-    jint loadJNI(JavaVM *vm) {
-        jvm = vm;
-        vm->AttachCurrentThread(&env, nullptr);
-        LOGI("loadJNI(): Initialized");
+    ImGui::Separator();
 
-        return JNI_VERSION_1_6;
-    }
-}
+    // 3. Các thanh trượt chỉ số (Sliders)
+    static float fFOV = 90.0f;
+    ImGui::SliderFloat("Aimbot FOV", &fFOV, 10.0f, 360.0f);
 
-__attribute__((constructor))
-void init() {
-    LOGI("Loaded Mod Menu");
+    static int iSpeed = 1;
+    ImGui::SliderInt("Speed Hack", &iSpeed, 1, 5);
 
-    pthread_t t;
-    pthread_create(&t, nullptr, thread, nullptr);
-
-    //Don't leave any traces, remap the loader lib as well
-    RemapTools::RemapLibrary("libLoader.so");
+    // 4. Kết thúc khung Menu
+    ImGui::End();
 }
