@@ -1,92 +1,220 @@
-#include <jni.h>
 #include <pthread.h>
 #include <unistd.h>
+#include "imgui.h"
 
-// Bắt buộc bao hàm ImGui
-#include "imgui.h" 
-#include "Main.h"
+// ============================================================
+// STATE
+// ============================================================
 
-// Cấu trúc lưu trạng thái các chức năng
-struct ModFeatures {
-    bool bypass = true;
-    bool fixCrash = true;
-    bool speedTime = false;
-    bool fakeLag = false;
-    bool resetGuest = false;
-    
-    bool espLine = false;
-    bool espBox = false;
-    bool espFov = false;
-    
-    bool aimBot = false;
-    bool aimHead = false;
-    bool aimLegit = false;
-    bool aimSilent = false;
-    bool aimKill = false;
-    int fovValue = 180;
-    
-    bool teleEnemy = false;
-    bool footballMode = false;
-    bool unlockSkin = false;
-} features;
+struct ModFeatures
+{
+    bool bypass;
+    bool fixCrash;
+    bool speedTime;
+    bool fakeLag;
+    bool resetGuest;
 
-// Vẽ Menu ImGui đầy đủ các Tab
-void DrawMenu() {
-    ImGui::Begin("xkietmods v5.2", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+    bool espLine;
+    bool espBox;
+    bool espFov;
 
-    ImGui::TextColored(ImVec4(0.2f, 0.8f, 1.0f, 1.0f), "Gói dịch vụ: XKIETMODS VIP");
-    ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Trạng thái: ● Đã kích hoạt");
+    bool aimBot;
+    bool aimHead;
+    bool aimLegit;
+    bool aimSilent;
+    bool aimKill;
+
+    int fovValue;
+
+    bool teleEnemy;
+    bool footballMode;
+    bool unlockSkin;
+
+    bool speedHack;
+    float speedValue;
+};
+
+static ModFeatures features =
+{
+    true,       // bypass
+    true,       // fixCrash
+    false,      // speedTime
+    false,      // fakeLag
+    false,      // resetGuest
+
+    false,      // espLine
+    false,      // espBox
+    false,      // espFov
+
+    false,      // aimBot
+    false,      // aimHead
+    false,      // aimLegit
+    false,      // aimSilent
+    false,      // aimKill
+
+    180,        // fovValue
+
+    false,      // teleEnemy
+    false,      // footballMode
+    false,      // unlockSkin
+
+    false,      // speedHack
+    1.0f        // speedValue
+};
+
+// ============================================================
+// SPEED HACK UI / DEMO STATE
+// ============================================================
+
+static void DrawSpeedHack()
+{
+    if (ImGui::Checkbox("Speed Hack", &features.speedHack))
+    {
+        if (!features.speedHack)
+        {
+            features.speedValue = 1.0f;
+        }
+    }
+
+    if (features.speedHack)
+    {
+        ImGui::SliderFloat("Speed", &features.speedValue, 1.0f, 5.0f, "%.1fx");
+        ImGui::Text("Speed Hack: ON");
+        ImGui::Text("Current Value: %.1fx", features.speedValue);
+    }
+    else
+    {
+        ImGui::Text("Speed Hack: OFF");
+    }
+}
+
+// ============================================================
+// MAIN TAB
+// ============================================================
+
+static void DrawMainTab()
+{
+    if (!ImGui::BeginTabItem("Main"))
+        return;
+
+    ImGui::Text("SYSTEM & SETTINGS");
     ImGui::Separator();
 
-    if (ImGui::BeginTabBar("ModTabs")) {
+    ImGui::Checkbox("Bypass", &features.bypass);
+    ImGui::Checkbox("Fix Crash", &features.fixCrash);
+    ImGui::Checkbox("Speed Time", &features.speedTime);
+    ImGui::Checkbox("Fake Lag", &features.fakeLag);
+    ImGui::Checkbox("Reset Guest", &features.resetGuest);
 
-        // TAB 1: Main
-        if (ImGui::BeginTabItem("🏠 Main")) {
-            ImGui::TextColored(ImVec4(0.2f, 0.8f, 1.0f, 1.0f), "HỆ THỐNG & BẢO VỆ");
-            ImGui::Checkbox("Bypass (Auto Active)", &features.bypass);
-            ImGui::Checkbox("Fix Crash (Anti-Crash)", &features.fixCrash);
-            ImGui::Checkbox("Speed Time", &features.speedTime);
-            ImGui::Checkbox("Fake Lag", &features.fakeLag);
-            ImGui::Checkbox("Reset Guest", &features.resetGuest);
-            ImGui::EndTabItem();
-        }
+    ImGui::Separator();
+    DrawSpeedHack();
 
-        // TAB 2: ESP
-        if (ImGui::BeginTabItem("👁️ ESP")) {
-            ImGui::TextColored(ImVec4(0.2f, 0.8f, 1.0f, 1.0f), "ESP VISUALS");
-            ImGui::Checkbox("ESP Line", &features.espLine);
-            ImGui::Checkbox("ESP Box", &features.espBox);
-            ImGui::Checkbox("ESP FOV (Vòng ngắm)", &features.espFov);
-            ImGui::EndTabItem();
-        }
+    ImGui::EndTabItem();
+}
 
-        // TAB 3: Aimbot
-        if (ImGui::BeginTabItem("🎯 Aimbot")) {
-            ImGui::TextColored(ImVec4(0.2f, 0.8f, 1.0f, 1.0f), "AIMBOT & ĐỘ HỢP LỆ");
-            ImGui::Checkbox("Aim Bot", &features.aimBot);
-            ImGui::Checkbox("Aim Head", &features.aimHead);
-            ImGui::Checkbox("Aim Legit", &features.aimLegit);
-            ImGui::Checkbox("Aim Silent", &features.aimSilent);
-            ImGui::Checkbox("Aim Kill", &features.aimKill);
-            ImGui::Separator();
-            ImGui::SliderInt("Bán kính ngắm (FOV)", &features.fovValue, 0, 360, "%d°");
-            ImGui::EndTabItem();
-        }
+// ============================================================
+// ESP TAB
+// ============================================================
 
-        // TAB 4: Tele & Football
-        if (ImGui::BeginTabItem("⚡ Tele & Folb")) {
-            ImGui::TextColored(ImVec4(0.2f, 0.8f, 1.0f, 1.0f), "TELEPORT & FOOTBALL");
-            ImGui::Checkbox("Tele to Enemy", &features.teleEnemy);
-            ImGui::Checkbox("Football Mode (Folb)", &features.footballMode);
-            ImGui::EndTabItem();
-        }
+static void DrawEspTab()
+{
+    if (!ImGui::BeginTabItem("ESP"))
+        return;
 
-        // TAB 5: Skin
-        if (ImGui::BeginTabItem("👕 Skin")) {
-            ImGui::TextColored(ImVec4(0.2f, 0.8f, 1.0f, 1.0f), "MOD SKIN");
-            ImGui::Checkbox("Unlock All Skin", &features.unlockSkin);
-            ImGui::EndTabItem();
-        }
+    ImGui::Text("ESP VISUALS");
+    ImGui::Separator();
+
+    ImGui::Checkbox("ESP Line", &features.espLine);
+    ImGui::Checkbox("ESP Box", &features.espBox);
+    ImGui::Checkbox("ESP FOV", &features.espFov);
+
+    ImGui::EndTabItem();
+}
+
+// ============================================================
+// AIM TAB
+// ============================================================
+
+static void DrawAimTab()
+{
+    if (!ImGui::BeginTabItem("Aimbot"))
+        return;
+
+    ImGui::Text("AIM SETTINGS");
+    ImGui::Separator();
+
+    ImGui::Checkbox("Aim Bot", &features.aimBot);
+    ImGui::Checkbox("Aim Head", &features.aimHead);
+    ImGui::Checkbox("Aim Legit", &features.aimLegit);
+    ImGui::Checkbox("Aim Silent", &features.aimSilent);
+    ImGui::Checkbox("Aim Kill", &features.aimKill);
+
+    ImGui::Separator();
+    ImGui::SliderInt("FOV", &features.fovValue, 0, 360, "%d");
+
+    ImGui::EndTabItem();
+}
+
+// ============================================================
+// TELE / FOOTBALL TAB
+// ============================================================
+
+static void DrawTeleTab()
+{
+    if (!ImGui::BeginTabItem("Tele & Folb"))
+        return;
+
+    ImGui::Text("TELEPORT & FOOTBALL");
+    ImGui::Separator();
+
+    ImGui::Checkbox("Tele to Enemy", &features.teleEnemy);
+    ImGui::Checkbox("Football Mode", &features.footballMode);
+
+    ImGui::EndTabItem();
+}
+
+// ============================================================
+// SKIN TAB
+// ============================================================
+
+static void DrawSkinTab()
+{
+    if (!ImGui::BeginTabItem("Skin"))
+        return;
+
+    ImGui::Text("SKIN SETTINGS");
+    ImGui::Separator();
+
+    ImGui::Checkbox("Unlock All Skin", &features.unlockSkin);
+
+    ImGui::EndTabItem();
+}
+
+// ============================================================
+// MAIN MENU
+// ============================================================
+
+void DrawMenu()
+{
+    ImGuiWindowFlags flags = ImGuiWindowFlags_AlwaysAutoResize;
+
+    if (!ImGui::Begin("xkietmods v5.2", nullptr, flags))
+    {
+        ImGui::End();
+        return;
+    }
+
+    ImGui::TextColored(ImVec4(0.2f, 0.8f, 1.0f, 1.0f), "XKIETMODS VIP");
+    ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: ACTIVE");
+    ImGui::Separator();
+
+    if (ImGui::BeginTabBar("ModTabs"))
+    {
+        DrawMainTab();
+        DrawEspTab();
+        DrawAimTab();
+        DrawTeleTab();
+        DrawSkinTab();
 
         ImGui::EndTabBar();
     }
@@ -94,27 +222,42 @@ void DrawMenu() {
     ImGui::End();
 }
 
-// Callback ImGui bắt buộc cho dự án
-void SetupImgui() {
+// ============================================================
+// IMGUI SETUP
+// ============================================================
+
+void SetupImgui()
+{
     DrawMenu();
 }
 
-// Luồng khởi tạo nền
-void *main_thread(void *arg) {
-    (void)arg; // Bỏ qua cảnh báo biến không sử dụng
+// ============================================================
+// BACKGROUND THREAD
+// ============================================================
+
+static void* main_thread(void*)
+{
     sleep(3);
-    
-    // Nơi đây thường sẽ gọi các logic hack (ví dụ đọc/ghi bộ nhớ)
-    
-    return NULL;
+
+    while (true)
+    {
+        sleep(1);
+    }
+
+    return nullptr;
 }
 
-// Chạy luồng khởi tạo an toàn qua JNI_OnLoad
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    (void)vm;       // Bỏ qua cảnh báo biến không sử dụng
-    (void)reserved; // Bỏ qua cảnh báo biến không sử dụng
-    
-    pthread_t pt;
-    pthread_create(&pt, NULL, main_thread, NULL);
-    return JNI_VERSION_1_6;
+// ============================================================
+// LIBRARY CONSTRUCTOR
+// ============================================================
+
+__attribute__((constructor))
+static void lib_main()
+{
+    pthread_t thread{};
+
+    if (pthread_create(&thread, nullptr, main_thread, nullptr) == 0)
+    {
+        pthread_detach(thread);
+    }
 }
